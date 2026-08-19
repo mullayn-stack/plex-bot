@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'project.tar.gz.b64'
+      - 'project.ready'
 
 permissions:
   contents: write
@@ -18,10 +18,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github ! -name project.tar.gz.b64 -exec rm -rf {} +
+          cat project.part.* > project.tar.gz.b64
           base64 --decode project.tar.gz.b64 > project.tar.gz
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github ! -name 'project.part.*' ! -name project.ready ! -name project.tar.gz ! -name project.tar.gz.b64 -exec rm -rf {} +
           tar -xzf project.tar.gz
-          rm -f project.tar.gz project.tar.gz.b64
+          rm -f project.tar.gz project.tar.gz.b64 project.part.* project.ready
       - name: Commit application source
         shell: bash
         run: |
